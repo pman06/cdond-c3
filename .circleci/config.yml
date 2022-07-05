@@ -98,7 +98,7 @@ jobs:
       - slack/notify:
           context: ALERTS
           event: pass
-          template: success_tagged_deploy_1
+          template: success_tagged_deploy_1 
                 
   test-backend:
     executor: docker-node
