@@ -1,5 +1,18 @@
 version: 2.1
 
+executors:
+  docker-node:
+    docker:
+      - image: circleci/node:13.8.0
+  
+  aws-cli:
+    docker:
+      - image: cimg/base:stable
+  
+  alpine:
+    docker:
+      - image: alpine:latest
+
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -34,74 +47,91 @@ commands:
             
 jobs:
   build-frontend:
-    docker:
-      - image: circleci/node:13.8.0
+    executor: docker-node
     steps:
       - checkout
-      - restore_cache:
-          keys: [frontend-build]
       - run:
           name: Build front-end
           command: |
-            # Your code here
-            exit 1
+            cd frontend
+            npm install 
+            npm run build
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
 
   build-backend:
-    docker:
-      - image: circleci/node:13.8.0
+    executor: docker-node
     steps:
       - checkout
-      - restore_cache:
-          keys: [backend-build]
       - run:
           name: Back-end build
           command: |
-             # Your code here
-             exit 1
+            cd backend
+            npm install
+            npm run build
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
 
   test-frontend:
-    docker:
-      # Docker image here
+    executor: docker-node
     steps:
-      # Checkout code from git
-      # Restore from cache
+      - checkout # Checkout code from git
+      - restore_cache:
+          keys: [frontend-build]
+      - run :
+          name: "Run frontend test"
+          command: |
+            cd frontend
+            npm run test
       # Your job code here
                 
   test-backend:
-    docker:
-      # Docker image here
+    executor: docker-node
     steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+      - checkout # Checkout code from git
+      - restore_cache: # Restore from cache
+          keys: [backend-build]
+      - run :   # Your job code here
+          name: "run backend test"
+          command: |
+            cd backend
+            npm run test
+      
             
   scan-frontend:
-    docker:
-      # Docker image here
+    executor: docker-node
     steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+      - checkout # Checkout code from git
+      - restore_cache:
+          keys: [frontend-build]   # Restore from cache
+      - run:      # Your job code here
+          name: "Scan frontend for vuln"
+          command: |
+            cd frontend
+            npm install
+            npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical
 
   scan-backend:
-    docker:
-      # Docker image here
+    executor: docker-node
     steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+      - checkout # Checkout code from git
+      - restore_cache:  # Restore from cache
+          keys: [backend-build]
+      - run:    # Your job code here
+          name: "Scan backend for vuln"     
+          command: |
+            cd backend
+            npm install
+            npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical
 
   deploy-infrastructure:
-    docker:
-      # Docker image here that supports AWS CLI
+    executor: aws-cli
     steps:
-      # Checkout code from git
+      - checkout # Checkout code from git
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -132,10 +162,9 @@ jobs:
       # Here's where you will add some code to rollback on failure      
 
   configure-infrastructure:
-    docker:
-      # Docker image here that supports Ansible
+    executor: aws-cli
     steps:
-      # Checkout code from git
+      - checkout # Checkout code from git
       # Add ssh keys with fingerprint
       # attach workspace
       - run:
@@ -151,8 +180,7 @@ jobs:
       # Here's where you will add some code to rollback on failure      
 
   run-migrations:
-    docker:
-      # Docker image here that supports NodeJS
+    executor: docker-node
     steps:
       # Checkout code from git
       - run:
@@ -168,8 +196,7 @@ jobs:
      # Here's where you will add some code to rollback on failure      
 
   deploy-frontend:
-    docker:
-      # Docker image here that supports AWS CLI
+    executor: aws-cli
     steps:
       # Checkout code from git
       - run:
@@ -189,10 +216,9 @@ jobs:
       # Here's where you will add some code to rollback on failure      
                     
   deploy-backend:
-    docker:
-      # Docker image here that supports Ansible
+    executor: docker-node
     steps:
-      # Checkout code from git
+      - checkout # Checkout code from git
       # Add ssh keys with fingerprint
       # attach workspace
       - run:
@@ -206,8 +232,7 @@ jobs:
       # Here's where you will add some code to rollback on failure  
 
   smoke-test:
-    docker:
-      # Lightweight Docker image 
+    executor: alpine
     steps:
       # Checkout code from git
       - run:
@@ -229,8 +254,7 @@ jobs:
       # Here's where you will add some code to rollback on failure  
 
   cloudfront-update:
-    docker:
-      # Docker image here that supports AWS CLI
+    executor: aws-cli
     steps:
       # Checkout code from git
       - run:
@@ -243,9 +267,8 @@ jobs:
             # your code here
       # Here's where you will add some code to rollback on failure  
 
-cleanup:
-    docker:
-      # Docker image here
+  cleanup:
+    executor: alpine
     steps:
       # Checkout code from git
       - run:
@@ -264,7 +287,7 @@ cleanup:
             
 
 workflows:
-  default:
+  build-jobs:
     jobs:
       - build-frontend
       - build-backend
