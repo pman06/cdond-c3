@@ -50,8 +50,7 @@ jobs:
     executor: docker-node
     steps:
       - checkout
-      - restore_cache:
-          keys: [frontend-build]
+
       - run:
           name: Build front-end
           command: |
@@ -66,8 +65,7 @@ jobs:
     executor: docker-node
     steps:
       - checkout
-      - restore_cache:
-          keys: [backend-build]
+
       - run:
           name: Back-end build
           command: |
