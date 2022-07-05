@@ -44,7 +44,10 @@ commands:
             #  Add revert code here. You can find this in the Getting Started section.
               exit 1
             fi
-            
+
+orbs:
+  slack: circleci/slack@4.1
+
 jobs:
   build-frontend:
     executor: docker-node
@@ -87,7 +90,15 @@ jobs:
           command: |
             cd frontend
             npm run test
-      # Your job code here
+      - slack/notify:
+          context: ALERTS
+          event: fail
+          mentions: '@paulshoremekun'
+          template: basic_fail_1
+      - slack/notify:
+          context: ALERTS
+          event: pass
+          template: success_tagged_deploy_1
                 
   test-backend:
     executor: docker-node
@@ -100,7 +111,15 @@ jobs:
           command: |
             cd backend
             npm run test
-      
+      - slack/notify:
+          context: ALERTS
+          event: fail
+          mentions: '@paulshoremekun'
+          template: basic_fail_1
+      - slack/notify:
+          context: ALERTS
+          event: pass
+          template: success_tagged_deploy_1
             
   scan-frontend:
     executor: docker-node
@@ -113,9 +132,13 @@ jobs:
           command: |
             cd frontend
             npm install
-            npm audit fix
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+      - slack/notify:
+          context: ALERTS
+          event: fail
+          mentions: '@paulshoremekun'
+          template: basic_fail_1  
 
   scan-backend:
     executor: docker-node
@@ -131,6 +154,11 @@ jobs:
             npm audit fix
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+      - slack/notify:
+          context: ALERTS
+          event: fail
+          mentions: '@paulshoremekun'
+          template: basic_fail_1
 
   deploy-infrastructure:
     executor: aws-cli
