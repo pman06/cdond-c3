@@ -217,7 +217,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-             apk add --update -y tar gzip aws-cli
+             apk add --update tar gzip aws-cli
       - run:
           name: Run migrations
           command: |
