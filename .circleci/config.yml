@@ -266,6 +266,7 @@ jobs:
             cd frontend
             npm install
             npm run build
+            ls -a
       - run:
           name: "Run tar"
           command: |
