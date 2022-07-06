@@ -127,6 +127,7 @@ jobs:
             npm audit fix
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+      
       - slack/notify:
           event: fail
           mentions: '@paulshoremekun'
@@ -146,6 +147,7 @@ jobs:
             npm audit fix
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+      
       - slack/notify:
           event: fail
           mentions: '@paulshoremekun'
@@ -264,8 +266,12 @@ jobs:
             cd frontend
             npm install
             npm run build
-            tar -czfv artifact-"${CIRCLE_WORKFLOW__ID:0:7}".tar.gz dist
-            aws s3 cp dist s3://udapeople-{CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - run:
+          name: Run tar
+          commands: tar -czfv artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+      - run:
+          name: copy to s3 bucket      
+          command: aws s3 cp dist s3://udapeople-{CIRCLE_WORKFLOW_ID:0:7} --recursive
       - destroy-environment # Here's where you will add some code to rollback on failure      
                     
   deploy-backend:
