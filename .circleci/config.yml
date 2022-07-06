@@ -131,7 +131,6 @@ jobs:
           mentions: '@paulshoremekun'
           template: basic_fail_1  
       
-
   scan-backend:
     executor: docker-node
     steps:
@@ -200,7 +199,6 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update ansible tar gzip aws-cli
-            cat .circleci/ansible/inventory.txt
       - run:
           name: Configure server
           command: |
@@ -232,28 +230,35 @@ jobs:
           command: |
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
-              curl --insecure https://kvdb.io/5kLRAEAZqV6HxdRmEDMvdG/migration_$\{CIRCLE_WORKFLOW_ID:0:7\}  -d '1'
+              curl --insecure "https://kvdb.io/5kLRAEAZqV6HxdRmEDMvdG/migration_${CIRCLE_WORKFLOW_ID:0:7}"  -d '1'
             fi
       - destroy-environment  # Here's where you will add some code to rollback on failure      
 
   deploy-frontend:
     executor: aws-cli
     steps:
-      # Checkout code from git
+      - checkout # Checkout code from git
+      - attach_workspace:
+          to: ~/
       - run:
           name: Install dependencies
           command: |
-            apt install -y  tar gzip 
+            sudo apt install -y  tar gzip 
       - run:
           name: Get backend url
           command: |
-            # your code here
+            export BACKEND_IP=$(cat .circleci/ansible/inventory.txt| head -2 | tail -1)
             export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
+            echo API_URL=$API_URL >> frontend/.env
+            cat frontend/.env
       - run:
           name: Deploy frontend objects
           command: |
-            # your code here
+            cd frontend
+            npm install
+            npm run build
+            tar -czfv artifact-"${CIRCLE_WORKFLOW__ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-{CIRCLE_WORKFLOW_ID:0:7} --recursive
       # Here's where you will add some code to rollback on failure      
                     
   deploy-backend:
