@@ -238,12 +238,12 @@ jobs:
     executor: aws-cli
     steps:
       - checkout # Checkout code from git
-      - attach_workspace:
-          at: ~/
       - run:
           name: Install dependencies
           command: |
-            sudo apt install -y  tar gzip 
+            sudo apt install -y  tar gzip
+      - attach_workspace:
+          at: ~/ 
       - run:
           name: Get backend url
           command: |
