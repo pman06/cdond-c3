@@ -266,10 +266,11 @@ jobs:
             cd frontend
             npm install
             npm run build
-            ls -Rla
       - run:
           name: "Run tar"
           command: |
+            pwd
+            cd frontend
             tar czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
       - run:
           name: copy to s3 bucket      
