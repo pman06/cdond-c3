@@ -177,7 +177,7 @@ jobs:
           name: Add back-end ip to ansible inventory
           command: |
             aws cloudformation list-exports --query "Exports[?Name=='PipelineID'].Value" \
-            --no-paginate --output text > ~/inventory.txt
+            --no-paginate --output text >> ~/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
@@ -188,19 +188,22 @@ jobs:
     executor: aws-cli
     steps:
       - checkout # Checkout code from git
-      # Add ssh keys with fingerprint
-      # attach workspace
+      -  add_ssh_keys: # Add ssh keys with fingerprint
+          fingerprints:
+            - "c0:3d:35:85:bb:69:71:39:8a:61:b4:b7:61:25:e0:6a"
+      - attach_workspace:  # attach workspace
+          at: ~/
       - run:
           name: Install dependencies
           command: |
-            # Your code here
-            exit 1
+            yum install -y ansible
+            yum install -y tar gzip
       - run:
           name: Configure server
           command: |
-            # Your code here
-            exit 1
-      # Here's where you will add some code to rollback on failure      
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
+      - destroy-environment  # Here's where you will add some code to rollback on failure      
 
   run-migrations:
     executor: docker-node
