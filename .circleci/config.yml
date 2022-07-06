@@ -177,7 +177,7 @@ jobs:
           name: Add back-end ip to ansible inventory
           command: |
             aws cloudformation list-exports --query "Exports[?Name=='PipelineID'].Value" \
-            --no-paginate --output text >> ~/inventory.txt
+            --no-paginate --output text >> ~/.circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
@@ -194,7 +194,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible tar gzip
+            apk add --update ansible tar gzip aws-cli
       - attach_workspace:  # attach workspace
           at: ~/
       - run:
