@@ -176,8 +176,10 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            aws cloudformation list-exports --query "Exports[?Name=='PipelineID'].Value" \
-            --no-paginate --output text >> .circleci/ansible/inventory.txt
+            aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filter "Name=tag:Nme,Values=backend-${ID}" \
+            --output text >> .circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
@@ -201,6 +203,7 @@ jobs:
           name: Configure server
           command: |
             cd .circleci/ansible
+            cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
       - destroy-environment  # Here's where you will add some code to rollback on failure      
 
