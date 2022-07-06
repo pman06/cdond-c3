@@ -23,7 +23,7 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name udapeople-backend--${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation delete-stack --stack-name udapeople-${CIRCLE_WORKFLOW_ID:0:7}
 
   revert-migrations:
@@ -191,13 +191,13 @@ jobs:
       -  add_ssh_keys: # Add ssh keys with fingerprint
           fingerprints:
             - "c0:3d:35:85:bb:69:71:39:8a:61:b4:b7:61:25:e0:6a"
-      - attach_workspace:  # attach workspace
-          at: ~/
       - run:
           name: Install dependencies
           command: |
             yum install -y ansible
             yum install -y tar gzip
+      - attach_workspace:  # attach workspace
+          at: ~/
       - run:
           name: Configure server
           command: |
