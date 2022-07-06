@@ -209,7 +209,7 @@ jobs:
       - destroy-environment  # Here's where you will add some code to rollback on failure      
 
   run-migrations:
-    executor: aws-cli
+    executor: alpine
     steps:
       - checkout # Checkout code from git
       - restore_cache:
@@ -217,12 +217,12 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update tar gzip npm
+            apk add --update tar gzip aws-cli npm
       - run:
           name: Run migrations
           command: |
             cd backend
-            npm install
+            npm i
             npm run migration > migrations_dump.txt
       - run:
           name: Send migration results to memstash/kvdb
