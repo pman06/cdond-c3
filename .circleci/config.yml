@@ -239,7 +239,7 @@ jobs:
     steps:
       - checkout # Checkout code from git
       - attach_workspace:
-          to: ~/
+          at: ~/
       - run:
           name: Install dependencies
           command: |
@@ -259,7 +259,7 @@ jobs:
             npm run build
             tar -czfv artifact-"${CIRCLE_WORKFLOW__ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-{CIRCLE_WORKFLOW_ID:0:7} --recursive
-      # Here's where you will add some code to rollback on failure      
+      - destroy-environment # Here's where you will add some code to rollback on failure      
                     
   deploy-backend:
     executor: docker-node
@@ -275,7 +275,7 @@ jobs:
           name: Deploy backend
           command: |
             # your code here
-      # Here's where you will add some code to rollback on failure  
+      - destroy-environment # Here's where you will add some code to rollback on failure  
 
   smoke-test:
     executor: alpine
@@ -297,7 +297,7 @@ jobs:
           name: Frontend smoke test.
           command: |
             # your code here
-      # Here's where you will add some code to rollback on failure  
+      - destroy-environment # Here's where you will add some code to rollback on failure  
 
   cloudfront-update:
     executor: aws-cli
@@ -311,7 +311,7 @@ jobs:
           name: Update cloudfront distribution
           command: |
             # your code here
-      # Here's where you will add some code to rollback on failure  
+      - destroy-environment # Here's where you will add some code to rollback on failure  
 
   cleanup:
     executor: alpine
