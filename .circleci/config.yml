@@ -235,7 +235,7 @@ jobs:
       - destroy-environment  # Here's where you will add some code to rollback on failure      
 
   deploy-frontend:
-    executor: aws-cli
+    executor: docker-node
     steps:
       - checkout # Checkout code from git
       - run:
