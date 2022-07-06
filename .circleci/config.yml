@@ -3,7 +3,7 @@ version: 2.1
 executors:
   docker-node:
     docker:
-      - image: cimg/base:stable
+      - image: circleci/node:13.8.0
   
   aws-cli:
     docker:
