@@ -210,7 +210,7 @@ jobs:
   run-migrations:
     executor: docker-node
     steps:
-      - checkout# Checkout code from git
+      - checkout # Checkout code from git
       - restore_cache:
           keys: [backend-build]
       - run:
