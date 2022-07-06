@@ -266,7 +266,7 @@ jobs:
             cd frontend
             npm install
             npm run build
-            ls -a
+            ls -Rla
       - run:
           name: "Run tar"
           command: |
@@ -281,16 +281,30 @@ jobs:
     executor: docker-node
     steps:
       - checkout # Checkout code from git
-      # Add ssh keys with fingerprint
-      # attach workspace
+      -  add_ssh_keys: # Add ssh keys with fingerprint
+          fingerprints:
+            - "c0:3d:35:85:bb:69:71:39:8a:61:b4:b7:61:25:e0:6a"
+      - attach_workspace:  # attach workspace
+          at: ~/
       - run:
           name: Install dependencies
           command: |
-            # your code here
+            apk add --update ansible tar gzip aws-cli 
       - run:
           name: Deploy backend
           command: |
-            # your code here
+            cd backend
+            npm i
+            npm run build
+            cd..
+            tar -C backend -czvf artifact.tar.gz . 
+      - run:
+          name: Start Ansible playbook      
+          command: | 
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment # Here's where you will add some code to rollback on failure  
 
   smoke-test:
