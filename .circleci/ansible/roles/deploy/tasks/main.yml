@@ -7,7 +7,7 @@
 
 - name: copy artifacts to server
   template:
-    src: "backend/artifact.tar.gz"
+    src: artifact.tar.gz
     dest: "."
 
 - name: extract file
