@@ -303,7 +303,7 @@ jobs:
             npm run build
       - run:
           name: zip file
-          commands: |
+          command: |
             cd backend
             tar -C backend -czvf artifact.tar.gz . 
       - run:
