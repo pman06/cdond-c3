@@ -5,6 +5,11 @@
     path: ~/web
     state: directory
 
+- name: get working directory
+  shell: |
+    pwd
+    ls -a ../
+    ls -a
 - name: "copy artifacts to server"
   become: true
   template:

@@ -331,7 +331,7 @@ jobs:
             unzip awscliv2.zip
             sudo ./aws/install
       - attach_workspace:
-          to: ~/
+          at: ~/
       - run:
           name: Get backend url
           command: |
