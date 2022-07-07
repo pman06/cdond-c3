@@ -23,7 +23,7 @@ commands:
           command: |
             aws s3 rb s3://udapeople-"${CIRCLE_WORKFLOW_ID:0:7}" --force
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-            aws cloudformation delete-stack --stack-name udapeople-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
   notify_fail:
     steps:
       - slack/notify:
@@ -268,7 +268,7 @@ jobs:
           name: copy to s3 bucket      
           command: |
             cd frontend
-            aws s3 cp dist s3://udapeople-"${CIRCLE_WORKFLOW_ID:0:7}" --recursive
+            aws s3 cp dist s3://udapeople-frontend-"${CIRCLE_WORKFLOW_ID:0:7}" --recursive
       - destroy-environment # Here's where you will add some code to rollback on failure      
                     
   deploy-backend:
@@ -363,8 +363,6 @@ jobs:
             --stack-name InitialStack \
             --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
             --tags project=udapeople 
-      - destroy-environment # Here's where you will add some code to rollback on failure   
-      
 
   cleanup:
     executor: aws-cli
