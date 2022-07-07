@@ -304,8 +304,6 @@ jobs:
           name: zip file
           command: |
             tar -C backend -czvf artifact.tar.gz . 
-            ls -al
-            pwd
       - run:
           name: Start Ansible playbook      
           command: | 

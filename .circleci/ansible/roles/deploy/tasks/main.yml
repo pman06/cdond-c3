@@ -8,7 +8,7 @@
 - name: "copy artifacts to server"
   become: true
   template:
-    src: --limit @/home/circleci/project/artifact.tar.gz
+    src: ~/project/artifact.tar.gz
     dest: "."
 
 - name: "extract file"
