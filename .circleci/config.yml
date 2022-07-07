@@ -378,6 +378,10 @@ jobs:
     executor: aws-cli
     steps:
       - checkout # Checkout code from git
+      - run:
+          name: Install dependencies
+          command: |
+            yum install -y tar gzip
       - attach_workspace:
           at: ~/
       - run:
@@ -385,17 +389,9 @@ jobs:
           command: |
             export OldWorkflowID=$(cat .circleci/old_job.txt)
             echo OldWorkflowID: "${OldWorkflowID}"
-            echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
-            export STACKS=($(aws cloudformation list-stacks \
-            --query "StackSummaries[*].StackName" --stack-status-filter CREATE_COMPLETE \
-            --no-paginate --output text))
-            echo Stack names: "${STACKS[@]}" 
-      - run:
-          name: Remove old stacks and files
-          command: |
-              aws s3 rm "s3://udapeople-frontend-${OldWorkflowID}" --recursive
-              aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-              aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+            aws s3 rm "s3://udapeople-frontend-${OldWorkflowID}" --recursive
+            aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
+            aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"        
             
 workflows:
   build-jobs:
