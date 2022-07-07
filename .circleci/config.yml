@@ -277,6 +277,9 @@ jobs:
           command: |
             cd frontend
             aws s3 cp dist s3://udapeople-"${CIRCLE_WORKFLOW_ID:0:7}" --recursive
+      - run:
+          name: delte bucket on fail
+          command: aws s3 
       - destroy-environment # Here's where you will add some code to rollback on failure      
                     
   deploy-backend:
@@ -291,7 +294,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            sudo apt install -y  tar gzip
+            sudo apt install -y  tar gzip ansible
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
@@ -368,7 +371,6 @@ jobs:
               # your code here
             fi
             
-
 workflows:
   build-jobs:
     jobs:
