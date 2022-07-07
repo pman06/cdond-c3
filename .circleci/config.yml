@@ -327,9 +327,9 @@ jobs:
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
             then
-              return 0
+              exit 0
             else
-              return 1
+              exit 1
             fi
       - run:
           name: Frontend smoke test.
@@ -338,9 +338,9 @@ jobs:
             echo ${URL} 
             if curl -s ${URL} | grep "Welcome"
             then
-              return 0
+              exit 0
             else
-              return 1
+              exit 1
             fi
       - destroy-environment  # Here's where you will add some code to rollback on failure  
       - revert-migrations:
@@ -358,10 +358,11 @@ jobs:
       - run:
           name: Update cloudfront distribution
           command: |
-            aws cloudformation list-exports --query "Exports[?Name=='WorkflowID'].Value" \
-            --no-paginate --output text > ~/textfile.txt
-
-            aws cloudf
+            aws cloudformation deploy \
+            --template-file .circleci/files/cloudfront.yml \
+            --stack-name InitialStack \
+            --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}"
+            --tags project=udapeople
       - destroy-environment # Here's where you will add some code to rollback on failure  
 
   cleanup:
