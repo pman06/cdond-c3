@@ -5,15 +5,10 @@
     path: ~/web
     state: directory
 
-- name: get working directory
-  shell: |
-    pwd
-    ls -a ../
-    ls -a
 - name: "copy artifacts to server"
   become: true
   template:
-    src: ../artifact.tar.gz
+    src: --limit @/home/circleci/project/artifact.tar.gz
     dest: "."
 
 - name: "extract file"
