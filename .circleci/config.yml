@@ -39,7 +39,7 @@ commands:
     steps:
       - run:
           name: Revert migrations
-          when: 0n_fail # Add when this will run
+          when: on_fail # Add when this will run
           command: |
             SUCCESS=$(curl --insecure  https://kvdb.io/5kLRAEAZqV6HxdRmEDMvdG/migration_<< parameters.workflow_id >>)
             echo $SUCCESS
