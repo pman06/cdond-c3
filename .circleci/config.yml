@@ -320,14 +320,9 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Get backend url
-          command: |
-            export BACKEND_IP=$(cat .circleci/ansible/inventory.txt| head -2 | tail -1)
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo $API_URL
-      - run:
           name: Backend smoke test.
           command: |
+            export BACKEND_IP=$(cat .circleci/ansible/inventory.txt| head -2 | tail -1)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
@@ -347,23 +342,26 @@ jobs:
             else
               return 1
             fi
-      #- destroy-environment  # Here's where you will add some code to rollback on failure  
-      #- revert-migrations:
-      #    workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment  # Here's where you will add some code to rollback on failure  
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
         
 
   cloudfront-update:
     executor: aws-cli
     steps:
-      # Checkout code from git
+      - checkout# Checkout code from git
       - run:
           name: Install dependencies
           command: |
-            # your code here
+            yum install tar gzip     # your code here
       - run:
           name: Update cloudfront distribution
           command: |
-            # your code here
+            aws cloudformation list-exports --query "Exports[?Name=='WorkflowID'].Value" \
+            --no-paginate --output text > ~/textfile.txt
+
+            aws cloudf
       - destroy-environment # Here's where you will add some code to rollback on failure  
 
   cleanup:
