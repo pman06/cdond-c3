@@ -25,6 +25,12 @@ commands:
           command: |
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation delete-stack --stack-name udapeople-${CIRCLE_WORKFLOW_ID:0:7}
+  notify_fail:
+    steps:
+      - slack/notify:
+          event: fail
+          mentions: '@paulshoremekun'
+          template: basic_fail_1
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -64,6 +70,7 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
+      - notify_fail
 
   build-backend:
     executor: docker-node
@@ -80,6 +87,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
+      - notify_fail
 
   test-frontend:
     executor: docker-node
@@ -92,10 +100,7 @@ jobs:
           command: |
             cd frontend
             npm run test
-      - slack/notify:
-          event: fail
-          mentions: '@paulshoremekun'
-          template: basic_fail_1
+      - notify_fail
                 
   test-backend:
     executor: docker-node
@@ -108,10 +113,7 @@ jobs:
           command: |
             cd backend
             npm run test
-      - slack/notify:
-          event: fail
-          mentions: '@paulshoremekun'
-          template: basic_fail_1
+      - notify_fail
             
   scan-frontend:
     executor: docker-node
@@ -127,11 +129,7 @@ jobs:
             npm audit fix
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-      
-      - slack/notify:
-          event: fail
-          mentions: '@paulshoremekun'
-          template: basic_fail_1  
+      - notify_fail 
       
   scan-backend:
     executor: docker-node
@@ -146,12 +144,8 @@ jobs:
             npm install
             npm audit fix
             npm audit fix --audit-level=critical --force
-            npm audit --audit-level=critical
-      
-      - slack/notify:
-          event: fail
-          mentions: '@paulshoremekun'
-          template: basic_fail_1
+            npm audit --audit-level=critical     
+      - notify_fail 
 
   deploy-infrastructure:
     executor: aws-cli
@@ -187,6 +181,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
+      - notify_fail 
       - destroy-environment # Here's where you will add some code to rollback on failure      
 
   configure-infrastructure:
@@ -279,7 +274,8 @@ jobs:
             aws s3 cp dist s3://udapeople-"${CIRCLE_WORKFLOW_ID:0:7}" --recursive
       - run:
           name: delte bucket on fail
-          command: aws s3 
+          command: aws s3 rb s3://udapeople-"${CIRCLE_WORKFLOW_ID:0:7}" --force
+          when: on_fail
       - destroy-environment # Here's where you will add some code to rollback on failure      
                     
   deploy-backend:
@@ -315,6 +311,10 @@ jobs:
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
+      - run:
+          name: clean up
+          command: aws s3 rb s3://udapeople-"${CIRCLE_WORKFLOW_ID:0:7}" --force
+          when: on_fail
       - destroy-environment # Here's where you will add some code to rollback on failure  
 
   smoke-test:

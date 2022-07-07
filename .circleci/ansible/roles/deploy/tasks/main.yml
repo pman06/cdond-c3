@@ -5,16 +5,19 @@
     path: ~/web
     state: directory
 
-- name: copy artifacts to server
+- name: "copy artifacts to server"
+  become: true
   template:
     src: artifact.tar.gz
     dest: "."
 
-- name: extract file
-  commands:
-    cmd: tar xzvf artifact.tar.gz
+- name: "extract file"
+  become: true
+  shell: |
+    tar xzvf artifact.tar.gz
 
 - name: "Start node server"
+  become: true
   shell: |
     npm install
     pm2 stop default
