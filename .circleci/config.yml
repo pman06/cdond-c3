@@ -320,18 +320,6 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Frontend smoke test.
-          command: |
-            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
-            echo ${URL} 
-            if curl -s ${URL} | grep "Welcome"
-            then
-              exit 1
-            else
-              exit 1
-            fi
-            
-      - run:
           name: Backend smoke test.
           command: |
             export BACKEND_IP=$(cat .circleci/ansible/inventory.txt| head -2 | tail -1)
@@ -339,6 +327,17 @@ jobs:
             echo "${API_URL}/api/status" 
             curl "${API_URL}/api/status" 
             if curl -s "${API_URL}/api/status" | grep "ok"
+            then
+              exit 0
+            else
+              exit 1
+            fi
+      - run:
+          name: Frontend smoke test.
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
             then
               exit 0
             else
