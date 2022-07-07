@@ -1,15 +1,10 @@
 ---
-- name: create directory
-  become: true
-  file:
-    path: ~/web
-    state: directory
 
 - name: "copy artifacts to server"
   become: true
-  template:
-    src: ~/artifact.tar.gz
-    dest: "."
+  copy:
+    src: ~/project/artifact.tar.gz
+    dest: .
 
 - name: "extract file"
   become: true
