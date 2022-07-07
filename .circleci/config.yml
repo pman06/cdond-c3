@@ -250,10 +250,10 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            
-            echo API_URL=$API_URL >> frontend/.env
-            cat frontend/.envexport BACKEND_IP=$(cat .circleci/ansible/inventory.txt| head -2 | tail -1)
+            export BACKEND_IP=$(cat .circleci/ansible/inventory.txt| head -2 | tail -1)
             export API_URL="http://${BACKEND_IP}:3030"
+            echo API_URL=$API_URL >> frontend/.env
+            cat frontend/.env
       - run:
           name: Deploy frontend objects
           command: |
