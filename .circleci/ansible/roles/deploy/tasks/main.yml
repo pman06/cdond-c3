@@ -4,7 +4,7 @@
   become: true
   copy:
     src: ~/project/artifact.tar.gz
-    dest: .
+    dest: ./artifact.tar.gz
 
 - name: "extract file"
   become: true
