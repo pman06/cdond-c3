@@ -15,9 +15,7 @@ executors:
 
 commands:
   destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-    parameters:
-      # Add parameter here   
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID. 
     steps:
       - run:
           name: Destroy environments
@@ -330,7 +328,7 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            echo
+            echo ${API_URL}
             if curl "${API_URL}/api/status" | grep "ok"
             then
               return 0
@@ -348,7 +346,10 @@ jobs:
             else
               return 1
             fi
-       # Here's where you will add some code to rollback on failure  
+      - destroy-environment  # Here's where you will add some code to rollback on failure  
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+        
 
   cloudfront-update:
     executor: aws-cli
