@@ -8,7 +8,7 @@
 - name: "copy artifacts to server"
   become: true
   template:
-    src: ~/project/artifact.tar.gz
+    src: ~/artifact.tar.gz
     dest: "."
 
 - name: "extract file"
