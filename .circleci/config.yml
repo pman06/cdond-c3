@@ -350,7 +350,7 @@ jobs:
   cloudfront-update:
     executor: aws-cli
     steps:
-      - checkout# Checkout code from git
+      - checkout # Checkout code from git
       - run:
           name: Install dependencies
           command: |
