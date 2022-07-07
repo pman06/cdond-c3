@@ -305,6 +305,7 @@ jobs:
           command: |
             tar -C backend -czvf artifact.tar.gz . 
             ls -al
+            pwd
       - run:
           name: Start Ansible playbook      
           command: | 
@@ -329,10 +330,18 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
+      - attach_workspace:
+          to: ~/
       - run:
           name: Get backend url
           command: |
-            export API_URL="http://${}:3030"
+            export API_URL="http://${BACKEND_IP}:3030"
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+              return 0
+            else
+              return 1
+            fi
       - run:
           name: Backend smoke test.
           command: |
