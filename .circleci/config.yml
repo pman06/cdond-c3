@@ -367,7 +367,7 @@ jobs:
       
 
   cleanup:
-    executor: alpine
+    executor: aws-cli
     steps:
       - checkout # Checkout code from git
       - run:
