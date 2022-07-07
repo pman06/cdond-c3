@@ -330,7 +330,7 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-          echo
+            echo
             if curl "${API_URL}/api/status" | grep "ok"
             then
               return 0
