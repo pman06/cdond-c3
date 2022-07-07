@@ -237,8 +237,6 @@ jobs:
     executor: docker-node
     steps:
       - checkout # Checkout code from git
-      - restore_cache:
-          keys: [frontend-build]
       - run:
           name: Install dependencies
           command: |
