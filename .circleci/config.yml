@@ -378,7 +378,7 @@ jobs:
     steps:
       - checkout # Checkout code from git
       - attach_workspace:
-          to: ~/
+          at: ~/
       - run:
           name: Get old stack workflow id
           command: |
